@@ -20,39 +20,29 @@ data<-read.csv(unz("./activity.zip","activity.csv"))
 str(data)
 
 ```
-The interval column is an integer, with the hundreds representing the hour. This is changed to a factor in the format hh:mm by the following code. 
+The interval column is an integer, with the hundreds representing the hour. This could be changed to a factor in the format hh:mm by the following code. 
 
 ```{r }
-data$interval<-as.factor(sprintf("%02d:%02d",
-                                 data$interval%/%100, 
-                                 data$interval%%100))
-class(data$interval)
-head(data,12)
+# data$interval<-as.factor(sprintf("%02d:%02d",
+#                                  data$interval%/%100, 
+#                                  data$interval%%100))
+# class(data$interval)
+# head(data,12)
 
 ```
-
-
+however this spoils the look of the time series plot, which would no longer have a line. Leaving it as is means that that plot would be misleading, it would appear continuous but in fact there would be jumps of 40 minutes every hour. So instead it is converted to minutes as follows:
+```{r }
+data$interval<-data$interval%/%100*60+data$interval%%100
+class(data$interval)
+data[10:20,]
+```
 ## What is mean total number of steps taken per day?
-
-The dplyr library is one way to summarise the data by day.
-The ggplotlibrary is one way to make a histogram of the total number of steps taken each day
+Summarise the data by day and produce a histogram of the total steps (with bin width of 1000).
 ```{r fig.width=10}
 daily_data<-data %>% group_by(date) %>% summarise(steps=sum(steps))
-ggplot(daily_data, aes(x=steps)) + geom_histogram(binwidth = 1500)
+ggplot(daily_data, aes(x=steps)) + geom_histogram(binwidth = 1000)
 ```
-To make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis), the data is summarised by intervals.
-```{r fig.width=10, dpi=150}
-interval_data<-data %>% group_by(interval) %>% summarise(steps=mean(steps,na.rm=TRUE))
-plot(interval_data,type="l")
 
-```
-Note that this plot has poor resolution, even when I play around with the dpi setting. Is this an issue with knitr? Saving the plot to png as follows:
-
-png(filename="interval_data_plot.png",width=1800, height=1200,res=300);
-plot(interval_data,type="l");
-dev.off()
-
-gives this result: "https://github.com/astewart18/RepData_PeerAssessment1/blob/master/interval_data_plot.png". If you have any ideas how to improve the embedded version, please let me know via the feedback :-)
 
 NA values are ignored in calculating the mean and median.
 ```{r }
@@ -65,7 +55,22 @@ The mean total number of steps per days is calculated as `r sprintf("%f",mean_to
 
 ## What is the average daily activity pattern?
 
+To make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis), the data is summarised by intervals.
+```{r fig.width=10, dpi=150}
+interval_data<-data %>% group_by(interval) %>% summarise(steps=mean(steps,na.rm=TRUE))
+plot(interval_data,type="l",xlab="5 minute intervals (starting minute)")
 
+```
+
+
+The 5-minute interval, on average across all the days in the dataset, containing the maximum number of steps can be determined by sorting the interval dataset by steps decreasing and looking at the top one (amongst other methods):
+```{r}
+top_interval<-arrange(interval_data,desc(steps))[1,1]
+top_interval
+```
+So the top interval starts at `r top_interval` minutes, in other words from  
+`r paste0(top_interval%/%60,":",top_interval%%60)` to
+`r paste0(top_interval%/%60,":",top_interval%%60+5)`.
 
 ## Imputing missing values
 

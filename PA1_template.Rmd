@@ -4,15 +4,65 @@ output:
   html_document:
     keep_md: true
 ---
-
+Loading libraries that will be used later. The rubric specifically says to show all code, so echo will be left on.
+```{r }
+require(dplyr)
+require(ggplot2)
+```
 
 ## Loading and preprocessing the data
+The file in the initial fork is in a zip archive in the current working directory. Extract and read it in.
 
+Look at the structure of the data to get a feel for the preprocessing requried.
+
+```{r }
+data<-read.csv(unz("./activity.zip","activity.csv"))
+str(data)
+
+```
+The interval column is an integer, with the hundreds representing the hour. This is changed to a factor in the format hh:mm by the following code. 
+
+```{r }
+data$interval<-as.factor(sprintf("%02d:%02d",
+                                 data$interval%/%100, 
+                                 data$interval%%100))
+class(data$interval)
+head(data,12)
+
+```
 
 
 ## What is mean total number of steps taken per day?
 
+The dplyr library is one way to summarise the data by day.
+The ggplotlibrary is one way to make a histogram of the total number of steps taken each day
+```{r fig.width=10}
+daily_data<-data %>% group_by(date) %>% summarise(steps=sum(steps))
+ggplot(daily_data, aes(x=steps)) + geom_histogram(binwidth = 1500)
+```
+To make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis), the data is summarised by intervals.
+```{r fig.width=10, dpi=150}
+interval_data<-data %>% group_by(interval) %>% summarise(steps=mean(steps,na.rm=TRUE))
+plot(interval_data,type="l")
 
+```
+Note that this plot has poor resolution, even when I play around with the dpi setting. Is this an issue with knitr? This alternative looks better.
+```{r}
+png(filename="interval_data_plot.png")
+plot(interval_data,type="l")
+dev.off()
+```
+This is the result
+![alt text]("./interval_data_plot.png" "Linked plot")
+
+NA values are ignored in calculating the mean and median.
+```{r }
+mean_total_steps_per_day<-mean(daily_data$steps,na.rm=TRUE)
+mean_total_steps_per_day
+median_total_steps_per_day<-median(daily_data$steps,na.rm=TRUE)
+median_total_steps_per_day
+```
+The mean total number of steps per days is calculated as `r sprintf("%f",mean_total_steps_per_day)` whereas the median is `r sprintf("%f",median_total_steps_per_day)`.
 
 ## What is the average daily activity pattern?
 

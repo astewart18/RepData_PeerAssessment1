@@ -46,14 +46,13 @@ interval_data<-data %>% group_by(interval) %>% summarise(steps=mean(steps,na.rm=
 plot(interval_data,type="l")
 
 ```
-Note that this plot has poor resolution, even when I play around with the dpi setting. Is this an issue with knitr? This alternative looks better.
-```{r}
-png(filename="interval_data_plot.png")
-plot(interval_data,type="l")
+Note that this plot has poor resolution, even when I play around with the dpi setting. Is this an issue with knitr? Saving the plot to png as follows:
+
+png(filename="interval_data_plot.png",width=1800, height=1200,res=300);
+plot(interval_data,type="l");
 dev.off()
-```
-This is the result
-![alt text]("./interval_data_plot.png" "Linked plot")
+
+gives this result: "https://github.com/astewart18/RepData_PeerAssessment1/blob/master/interval_data_plot.png". If you have any ideas how to improve the embedded version, please let me know via the feedback :-)
 
 NA values are ignored in calculating the mean and median.
 ```{r }

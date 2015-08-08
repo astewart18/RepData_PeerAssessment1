@@ -75,6 +75,44 @@ So the top interval starts at `r top_interval` minutes, in other words from
 `r paste0(top_interval%/%60,":",top_interval%%60+5)`.
 
 ## Imputing missing values
+To determine the number of missing values, create a logical vector and count them by creating the sum, since the TRUE values are 1, and the false ones are 0.
+```{r}
+missing<-is.na(data$steps)
+sum(missing)
+```
+This shows `r sum(missing)` intervals have no recorded steps.
+
+Creating a new dataset with the NA values replaced with the median across all days of the interval can be achieved by first adding this value to the dataframe using a join to the previously created interval_data summary table, and then copyin this value to the steps field for all rows with an NA steps value.
+```{r}
+imputed_data<-inner_join(data,interval_data,by=c("interval"="interval"))
+imputed_data[missing,1]<-imputed_data[missing,4]
+# Now drop the extra column and rename the first back to steps
+imputed_data[,4]<-NULL
+colnames(imputed_data)[1]<-"steps"
+# show there are no more NA values
+summary(imputed_data)
+
+```
+
+Repeat the previous steps to summarise the imputed data by day and produce a histogram of the total steps (with bin width of 1000).
+```{r fig.width=10}
+daily_data<-imputed_data %>% group_by(date) %>% summarise(steps=sum(steps))
+ggplot(daily_data, aes(x=steps)) + geom_histogram(binwidth = 1000)
+```
+
+
+
+```{r }
+imputed_mean_total_steps_per_day<-mean(daily_data$steps)
+imputed_mean_total_steps_per_day
+imputed_median_total_steps_per_day<-median(daily_data$steps)
+imputed_median_total_steps_per_day
+```
+The mean total number of steps per days is calculated as `r sprintf("%f",imputed_mean_total_steps_per_day)` whereas the median is `r sprintf("%f",imputed_median_total_steps_per_day)`.
+
+The difference in means after imputation is `r sprintf("%f",imputed_mean_total_steps_per_day - mean_total_steps_per_day)`, and in medians is `r sprintf("%f",imputed_median_total_steps_per_day - median_total_steps_per_day)`.
+
+Interestingly, this particular choice of imputation style has led to the mean and median being the same. That the mean was not modified is not so surprising.
 
 
 

@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 Loading libraries that will be used later. The rubric specifically says to show all code, so echo will be left on.
 
 ```r
@@ -91,7 +96,7 @@ daily_data<-data %>% group_by(date) %>% summarise(steps=sum(steps))
 ggplot(daily_data, aes(x=steps)) + geom_histogram(binwidth = 1000)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
 
 
 NA values are ignored in calculating the mean and median.
@@ -125,7 +130,7 @@ plot(interval_data,type="l",xlab="5 minute interval",xaxt = "n")
 axis(1, at = c(0, 6*60, 12*60, 18*60,24*60),labels=c("midnight", "6am","noon", "6pm","midnight"))
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-7-1.png) 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
 
 
 The 5-minute interval, on average across all the days in the dataset, containing the maximum number of steps can be determined by sorting the interval dataset by steps decreasing and looking at the top one (amongst other methods):
@@ -185,7 +190,7 @@ daily_data<-imputed_data %>% group_by(date) %>% summarise(steps=sum(steps))
 ggplot(daily_data, aes(x=steps)) + geom_histogram(binwidth = 1000)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-11-1.png) 
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
 
 
 
@@ -217,7 +222,7 @@ Interestingly, this particular choice of imputation style has led to the mean an
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-Creating a new factor variable in the dataset with two levels ¬ñ ¬ìweekday¬î and ¬ìweekend¬î indicating whether a given date is a weekday or weekend day, then grouping by this field and the interval, summarising the average steps across all days.
+Creating a new factor variable in the dataset with two levels ‚<U+0080><U+0093> ‚<U+0080><U+009C>weekday‚<U+0080>ù and ‚<U+0080><U+009C>weekend‚<U+0080>ù indicating whether a given date is a weekday or weekend day, then grouping by this field and the interval, summarising the average steps across all days.
 
 
 ```r
@@ -247,5 +252,5 @@ ggplot(week_data, aes(x = interval, y = steps, group = daytype)) +
         facet_grid(daytype~.)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
 The plot shows a significantly lower spike during weekends in the number of steps taken around 8:30 am, and slightly increased activity over the rest of the day. 

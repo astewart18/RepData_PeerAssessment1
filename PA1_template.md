@@ -30,7 +30,7 @@ require(ggplot2)
 ## Loading and preprocessing the data
 The file in the initial fork is in a zip archive in the current working directory. Extract and read it in.
 
-Look at the structure of the data to get a feel for the preprocessing requried.
+Look at the structure of the data to get a feel for the preprocessing required.
 
 
 ```r
@@ -54,7 +54,7 @@ The interval column is an integer, with the hundreds representing the hour. This
 # class(data$interval)
 # head(data,12)
 ```
-however this spoils the look of the time series plot, which would no longer have a line. Leaving it as is means that that plot would be misleading, it would appear continuous but in fact there would be jumps of 40 minutes every hour. So instead it is converted to minutes as follows:
+however this spoils the look of the time series plot, which would no longer have a line. With no change, the line would appear continuous, but in fact there would be jumps of 40 minutes every hour. So instead it is converted to minutes as follows:
 
 ```r
 data$interval<-data$interval%/%100*60+data$interval%%100
@@ -141,9 +141,7 @@ top_interval
 ##   interval
 ## 1      515
 ```
-So the top interval starts at 515 minutes, in other words from  
-8:35 to
-8:40.
+So the top interval starts at 515 minutes, in other words from 8:35 to 8:40.
 
 ## Imputing missing values
 To determine the number of missing values, create a logical vector and count them by creating the sum, since the TRUE values are 1, and the false ones are 0.
@@ -159,8 +157,8 @@ sum(missing)
 This shows 2304 intervals have no recorded steps.
 
 Creating a new dataset with the NA values replaced with the median across all days of the interval can be achieved by
-* adding this value to the dataframe using a join to the previously created interval_data summary table
-* copying this value to the steps field for all rows with an NA steps value
+        * adding this value to the dataframe using a join to the previously created interval_data summary table
+        * copying this value to the steps field for all rows with an NA steps value
 
 
 ```r
@@ -232,7 +230,7 @@ week_data<-imputed_data %>%
         summarise(steps=mean(steps))
 ```
 
-Using ggplot to create a panel plot similar to the reference one in the original readme for this assignment.The plot shows a significantly lower spike in the number of steps taken around 8:30 am, and slightly increased activity over the rest of the day. 
+Using ggplot to create a panel plot similar to the reference one in the original readme for this assignment.
 
 ```r
 timeHM_formatter <- function(x) {
@@ -246,7 +244,8 @@ timeHM_formatter <- function(x) {
 ggplot(week_data, aes(x = interval, y = steps, group = daytype)) +
         geom_line() +
         scale_x_continuous(label=timeHM_formatter) +
-        facet_wrap(~ daytype, ncol=1  )
+        facet_grid(daytype~.)
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
+The plot shows a significantly lower spike during weekends in the number of steps taken around 8:30 am, and slightly increased activity over the rest of the day. 
